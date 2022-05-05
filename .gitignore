@@ -1,0 +1,13 @@
+*pyc
+*swp
+*pkl
+envfreediv10Xcellbcs
+build
+dist
+envfreediv10Xcellbcs.egg-info
+*codebook*
+2
+3
+counts.txt
+editmeasures.c
+*_decoded.txt
