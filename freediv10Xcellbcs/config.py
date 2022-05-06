@@ -40,12 +40,16 @@ class CommandLineArguments(object):
         return int(self._arguments['<num_errors>'] or 0)
 
     @property
+    def expected_cells(self):
+        return int(self._arguments['--expected-cells'] or 10000)
+
+    @property
     def barcode_file(self):
-        return os.path.expanduser(self.arguments('--barcode-file')) if self._arguments['--barcode-file'] else None
+        return os.path.expanduser(self._arguments('--barcode-file')) if self._arguments['--barcode-file'] else None
 
     @property
     def barcode_whitelist(self):
-        return os.path.expanduser(self.arguments('--barcode-whitelist')) if self._arguments['--barcode-whitelist'] else None
+        return os.path.expanduser(self._arguments('--barcode-whitelist')) if self._arguments['--barcode-whitelist'] else None
 
     @property
     def threads(self):
