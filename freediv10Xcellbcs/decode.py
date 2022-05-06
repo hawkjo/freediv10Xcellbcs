@@ -118,6 +118,7 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
         out.write('\n'.join([f'{bc}\t{count}' for bc, count in bcs_and_counts]))
     with open(os.path.join(arguments.output_dir, 'bcs_of_interest.txt'), 'w') as out:
         out.write('\n'.join(bc_oi_list))
+    log.info(f'Found {len(bc_oi_list):,d} barcodes of interest')
 
     return bc_oi_list
     
