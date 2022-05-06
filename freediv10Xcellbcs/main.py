@@ -2,14 +2,14 @@
 Free divergence-based decoding of 10X cell barcodes
 
 Usage:
-  freediv10Xcellbcs decode       <barcode_files> <fastq_files> <5p_or_3p> [--output-dir=<output_dir>] [-v | -vv | -vvv]
+  freediv10Xcellbcs decode       <fastq_files> <5p_or_3p> [--barcode-file=<barcode_file>] [--barcode-whitelist=<barcode_whitelist>] [--output-dir=<output_dir>] [-v | -vv | -vvv]
 
 Options:
   -h --help     Show this screen.
   --version     Show version.
 
 Commands:
-  decode        Decode barcodes in fastq files. Separate file names with commas.
+  decode        Decode barcodes in fastq files with same barcodes. Separate file names with commas.
 
 """
 import logging

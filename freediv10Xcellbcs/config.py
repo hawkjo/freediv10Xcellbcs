@@ -16,10 +16,6 @@ class CommandLineArguments(object):
         return []
 
     @property
-    def barcode_files(self):
-        return [os.path.expanduser(fp) for fp in self._comma_delimited_arg('<barcode_files>')]
-
-    @property
     def command(self):
         # We have to do this weird loop to deal with the way docopt stores the command name
         for possible_command in ('decode'):
@@ -42,6 +38,14 @@ class CommandLineArguments(object):
     @property
     def num_errors(self):
         return int(self._arguments['<num_errors>'] or 0)
+
+    @property
+    def barcode_file(self):
+        return os.path.expanduser(self.arguments('--barcode-file')) if self._arguments['--barcode-file'] else None
+
+    @property
+    def barcode_whitelist(self):
+        return os.path.expanduser(self.arguments('--barcode-whitelist')) if self._arguments['--barcode-whitelist'] else None
 
     @property
     def threads(self):
