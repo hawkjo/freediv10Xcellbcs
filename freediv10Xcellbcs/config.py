@@ -36,8 +36,12 @@ class CommandLineArguments(object):
         return log_level.get(self._arguments['-v'], logging.ERROR)
 
     @property
-    def num_errors(self):
-        return int(self._arguments['<num_errors>'] or 0)
+    def max_err_decode(self):
+        return int(self._arguments['--max-err-decode'] or 2)
+
+    @property
+    def reject_delta(self):
+        return int(self._arguments['--reject-delta'] or 0)
 
     @property
     def expected_cells(self):
@@ -58,3 +62,7 @@ class CommandLineArguments(object):
     @property
     def output_dir(self):
         return self._arguments['--output-dir'] or '.'
+
+    @property
+    def kit_5p_or_3p(self):
+        return self._arguments['<kit_5p_or_3p>']
