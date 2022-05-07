@@ -1,9 +1,12 @@
 from Bio import Align
+from Bio import SeqIO
+from .misc import gzip_friendly_open
 from .constants import sp1_10X_primer
 
 
 class PrimerAligner:
     primerseq = sp1_10X_primer
+    err_thresh = -int(0.25*len(primerseq))  # no more than 25% errors
     aligner = Align.PairwiseAligner()
     aligner.wildcard = 'N'
     aligner.match = 0
@@ -12,51 +15,62 @@ class PrimerAligner:
     aligner.target_left_gap_score = 0
     aligner.target_right_gap_score = 0
 
-    def __init__(self):
-        pass
+    def __init__(self, fwd_primer_max_end=None, rc_primer_max_end=None):
+        self.fwd_primer_max_end = fwd_primer_max_end
+        self.rc_primer_max_end = rc_primer_max_end
 
     def align_rec(self, rec):
         return self.aligner.align(self.primer_seq, str(rec.seq))
 
-    def align_seq(self, seq)
+    def align_seq(self, seq):
         return self.aligner.align(self.primer_seq, seq)
+
+    def iterate_recs_with_primer_pos(self, fastq_files):
+        """
+        Iterates a list of fastq files and yields rec, strand, primer_start, primer_end
+        """
+        for fastq_file in fastq_files:
+            for rec in SeqIO.parse(gzip_friendly_open(fastq_file)):
+                strand, start, end = self.get_primer_pos_in_rec(rec)
+                yield rec, strand, start, end
+
+    def get_primer_pos_in_rec(self, rec):
+        """
+        Finds the strand, start, and end of primer in given rec. Returns all None if not found.
+        """
+        best_fwd_alignment = self.align_rec(rec[:self.fwd_primer_max_end])[0]
+        best_rc_alignment = self.align_rec(rec.reverse_complement()[:self.rc_primer_max_end])[0]
+        if best_fwd_alignment.score >= self.err_thresh and best_rc_alignment.score < self.err_thresh:
+            start = best_fwd_alignment.aligned[1][0][0]  
+            end = best_fwd_alignment.aligned[1][-1][-1] 
+            return '+', start, end
+        elif best_fwd_alignment.score < self.err_thresh and best_rc_alignment.score >= self.err_thresh:
+            start = best_rc_alignment.aligned[1][0][0]
+            end = best_rc_alignment.aligned[1][-1][-1]
+            return '-', start, end
+        else:
+            return None, None, None
 
 
 class OrientedPrimerSeq:
-    primerseq = 'CTACACGACGCTCTTCCGATCT'
-    
-    aligner = Align.PairwiseAligner()
-    aligner.wildcard = 'N'
-    aligner.mismatch = -1
-    aligner.gap_score = -2.1
-    aligner.target_left_gap_score = 0
-    aligner.target_right_gap_score = 0
-
-    def __init__(self, fq_rec, hit):
-        self.hit = hit
-        if self.hit.strand == '+':
-            self.fq_rec = fq_rec
+    def __init__(self, rec, fwd_primer_max_end, rc_primer_max_end):
+        self.primer_aligner = PrimerAligner(fwd_primer_max_end, rc_primer_max_end)
+        self.strand, self.primer_start, self.primer_end = self.primer_aligner.get_primer_pos_in_rec(rec)
+        if self.strand is None:
+            self.orientation_failed = True
+            return
         else:
-            self.fq_rec = fq_rec.reverse_complement()
-            name = f'rc-{fq_rec.name}'
-            self.fq_rec.id = name
-            self.fq_rec.name = name
-            self.fq_rec.description = fq_rec.description
+            self.orientation_failed = False
+            if self.strand == '-':
+                rec = rec.reverse_complement()
+                name = f'{rec.name}:rev_comp'
+                self.rec.id = name
+                self.rec.name = name
+                self.rec.description = rec.description
             
-        self.seq = str(self.fq_rec.seq)
+        self.seq = str(self.rec.seq)
         self.bc = None
         self.umi = None
-        
-        start_buff = self.hit.pstart + 5
-        end_buff = len(self.primerseq) - self.hit.pend + 5
-        self.subseq_start = max(0, self.hit.qstart - start_buff)
-        self.subseq_end = self.hit.qend + end_buff
-        self.subseq = self.seq[self.subseq_start:self.subseq_end]
-        
-        self.alignment = self.aligner.align(self.primerseq, self.subseq)[0]
-        self.is_well_formed = bool(self.alignment.path[1][0] == 0 and self.alignment.path[-2][0] == len(self.primerseq))  # has leading and trailing gaps
-        self.primer_start = self.subseq_start + self.alignment.path[1][1]
-        self.primer_end = self.subseq_start + self.alignment.path[-2][1]  # Query position where trailing gaps begin
         
     @property
     def observed_primer(self):
@@ -64,15 +78,15 @@ class OrientedPrimerSeq:
     
     @property
     def observed_prefix(self):
-        return self.seq[self.primer_start:self.tail_end]
-    
+        return self.seq[self.primer_start:self.prefix_end]
+
     @property
     def seq_after_primer(self):
         return self.seq[self.primer_end:]
     
     @property
     def rec_after_primer(self):
-        return self.fq_rec[self.primer_end:]
+        return self.rec[self.primer_end:]
     
     @property
     def seq_after_prefix(self):
@@ -80,18 +94,18 @@ class OrientedPrimerSeq:
     
     @property
     def rec_after_prefix(self):
-        return self.fq_rec[self.prefix_end:]
+        return self.rec[self.prefix_end:]
     
     def set_barcode_and_umi(self, bc, umi):
         assert self.bc is None and self.umi is None, (self.bc, self.umi)
         self.bc = bc
         self.umi = umi
-        name = f'{bc}_{umi}#{self.fq_rec.id}'
-        self.fq_rec.id = name
-        self.fq_rec.name = name
+        name = f'{bc}_{umi}#{self.rec.id}'
+        self.rec.id = name
+        self.rec.name = name
         
-    def set_prefix_end_from_rel_tail_end_after_primer(self, tail_end_after_primer):
-        self.prefix_end = self.primer_end + tail_end_after_primer
+    def set_prefix_end_from_rel_prefix_end_after_primer(self, rel_prefix_end_after_primer):
+        self.prefix_end = self.primer_end + rel_prefix_end_after_primer
         
     def get_kmers_at_primer_end_plusminus(self, k, plusminus):
         """
@@ -109,7 +123,7 @@ class OrientedPrimerSeq:
 
 class BcUmiTailAligner:
     tail_5p_kit_tso = 'TTTCTTATATGGG'
-    tail_3p_kit_polyA = 'T'*15
+    tail_3p_kit_polyT = 'T'*len(tail_5p_kit_tso)
     
     aligner = Align.PairwiseAligner()
     aligner.wildcard = 'N'
@@ -121,7 +135,7 @@ class BcUmiTailAligner:
         
     def __init__(self, bc, umi_len, kit):
         if kit == '3p':
-            self.tail = self.tail_3p_kit_polyA
+            self.tail = self.tail_3p_kit_polyT
         elif kit == '5p':
             self.tail = self.tail_5p_kit_tso
         else:
@@ -161,9 +175,6 @@ class BcUmiTailAligner:
                     continue
                 break
                 
-        assert obs_bc_end is not None, str(alignment)
-        assert obs_tail_start is not None, str(alignment)
-        
         tstart, tend = alignment.aligned[0][-1]
         qstart, qend = alignment.aligned[1][-1]
         obs_tail_end = qend + self.tail_end - tend
@@ -188,9 +199,6 @@ class BcUmiTailAligner:
         umi = seq[obs_bc_end:obs_tail_start]
         return umi, obs_tail_start
     
-    def get_bc_umi_tail(self, seq):
+    def get_observed_bc_umi_tail(self, seq):
         obs_bc_end, obs_tail_start, obs_tail_end = self.find_key_boundaries(seq)
         return seq[0:obs_bc_end], seq[obs_bc_end:obs_tail_start], seq[obs_tail_start:obs_tail_end]
-
-
-
