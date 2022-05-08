@@ -166,7 +166,7 @@ def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, 
             stats['Filter 3: seq long enough'] += 1
             for obs_bc, start_pos in ops.get_kmers_at_primer_end_plusminus(16, 2):
                 bc = bd.decode(obs_bc)
-                if bc is not None:
+                if isinstance(bc, str):
                     ops.primer_end = start_pos
                     stats['Filter 4: bc found'] += 1
                     break
@@ -249,7 +249,7 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments
             stats['Filter 3: seq long enough'] += 1
             for obs_bc, start_pos in ops.get_kmers_at_primer_end_plusminus(16, 2):
                 bc = bd.decode(obs_bc)
-                if bc is not None:
+                if isinstance(bc, str):
                     ops.primer_end = start_pos
                     stats['Filter 4: bc found'] += 1
                     break
