@@ -61,8 +61,10 @@ class OrientedPrimerSeq:
             return
         else:
             self.orientation_failed = False
-            if self.strand == '-':
-                rec = rec.reverse_complement()
+            if self.strand == '+':
+                self.rec = rec
+            elif self.strand == '-':
+                self.rec = rec.reverse_complement()
                 name = f'{rec.name}:rev_comp'
                 self.rec.id = name
                 self.rec.name = name
