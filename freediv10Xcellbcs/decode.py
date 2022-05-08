@@ -50,11 +50,12 @@ def find_primer_dist_ends(arguments):
         if len(fwd_ends) < 100 or len(rc_ends) < 100:
             raise RuntimeError(f'Not enough reads on fwd or rc strand: {len(fwd_ends):,d}, {len(rc_ends)}')
         log.warn(f'Did not find 10k fwd and rc seqs. Actual: {len(fwd_ends):,d}, {len(rc_ends)}')
-    log.info(f'Found {len(fwd_ends):,d} fwd and {len(rc_ends)} rc primers after {total_seqs:,d} reads')
-    fwd_75 = np.percentile(fwd_ends, 75)
-    fwd_99 = np.percentile(fwd_ends, 99)
-    rc_75 = np.percentile(rc_ends, 75)
-    rc_99 = np.percentile(rc_ends, 99)
+    total_seqs += 1
+    log.info(f'Found {len(fwd_ends):,d} fwd and {len(rc_ends):,d} rc primers after {total_seqs:,d} reads')
+    fwd_75 = int(np.percentile(fwd_ends, 75))
+    fwd_99 = int(np.percentile(fwd_ends, 99))
+    rc_75 = int(np.percentile(rc_ends, 75))
+    rc_99 = int(np.percentile(rc_ends, 99))
     fwd_end = min(fwd_75 + 20, fwd_99 + 5)
     rc_end = min(rc_75 + 20, rc_99 + 5)
     log.debug(f'Fwd ends 75th pctl = {fwd_75:,d}, 99th pctl = {fwd_99:,d}')
