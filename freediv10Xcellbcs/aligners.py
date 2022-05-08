@@ -20,10 +20,10 @@ class PrimerAligner:
         self.rc_primer_max_end = rc_primer_max_end
 
     def align_rec(self, rec):
-        return self.aligner.align(self.primer_seq, str(rec.seq))
+        return self.aligner.align(self.primerseq, str(rec.seq))
 
     def align_seq(self, seq):
-        return self.aligner.align(self.primer_seq, seq)
+        return self.aligner.align(self.primerseq, seq)
 
     def iterate_recs_with_primer_pos(self, fastq_files):
         """
