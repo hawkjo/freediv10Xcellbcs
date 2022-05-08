@@ -242,7 +242,7 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments
                 stats['Filter 2: primer alignment fails check'] += 1
                 continue
             stats['Filter 2: primer alignment passes check'] += 1
-            if len(ops.seq_after_primer) < len(example_full_prefix):
+            if len(ops.seq_after_primer) < 18:
                 stats['Filter 3: seq too short'] += 1
                 continue
             stats['Filter 3: seq long enough'] += 1
