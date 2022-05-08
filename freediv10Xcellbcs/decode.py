@@ -52,14 +52,14 @@ def find_primer_dist_ends(arguments):
         log.warn(f'Did not find 10k fwd and rc seqs. Actual: {len(fwd_ends):,d}, {len(rc_ends)}')
     total_seqs += 1
     log.info(f'Found {len(fwd_ends):,d} fwd and {len(rc_ends):,d} rc primers after {total_seqs:,d} reads')
-    fwd_75 = int(np.percentile(fwd_ends, 75))
+    fwd_90 = int(np.percentile(fwd_ends, 90))
     fwd_99 = int(np.percentile(fwd_ends, 99))
-    rc_75 = int(np.percentile(rc_ends, 75))
+    rc_90 = int(np.percentile(rc_ends, 90))
     rc_99 = int(np.percentile(rc_ends, 99))
-    fwd_end = min(fwd_75 + 20, fwd_99 + 8)
-    rc_end = min(rc_75 + 20, rc_99 + 8)
-    log.debug(f'Fwd ends 75th pctl = {fwd_75:,d}, 99th pctl = {fwd_99:,d}')
-    log.debug(f'Rc ends 75th pctl = {rc_75:,d}, 99th pctl = {rc_99:,d}')
+    fwd_end = min(fwd_90 + 20, fwd_99 + 8)
+    rc_end = min(rc_90 + 20, rc_99 + 8)
+    log.debug(f'Fwd ends 90th pctl = {fwd_90:,d}, 99th pctl = {fwd_99:,d}')
+    log.debug(f'Rc ends 90th pctl = {rc_90:,d}, 99th pctl = {rc_99:,d}')
     log.info(f'Fwd primer search end: {fwd_end:,d},  Rc primer search end: {rc_end:,d}')
     return fwd_end, rc_end
 
