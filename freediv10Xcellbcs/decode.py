@@ -105,6 +105,7 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
     bc_oi_thresh = 50
     bcs_and_counts = [(bc, count) for bc, count in bc_cntr.items()]
     bcs_and_counts.sort(reverse=True, key=lambda tup: tup[1])
+    counts = [count for bc, count in bcs_and_counts]
     bc_oi_list = [bc for bc, count in bcs_and_counts if count > bc_oi_thresh]
     with open(os.path.join(arguments.output_dir, 'all_bcs_and_counts.txt'), 'w') as out:
         out.write('\n'.join([f'{bc}\t{count}' for bc, count in bcs_and_counts]))
@@ -112,7 +113,7 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
         out.write('\n'.join(bc_oi_list))
     log.info(f'Found {len(bc_oi_list):,d} barcodes of interest')
 
-    fig, ax = knee_plot(bc_cntr, bc_oi_thresh, good_label='BCs of interest')
+    fig, ax = knee_plot(counts, bc_oi_thresh, good_label='BCs of interest')
     fig.savefig(os.path.join(arguments.output_dir, 'bcs_of_interest_knee_plot.png'), dpi=300)
 
     return bc_oi_list
