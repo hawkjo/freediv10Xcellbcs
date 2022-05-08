@@ -66,7 +66,6 @@ def find_primer_dist_ends(arguments):
 
 def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
     # Find primer ends and gather the raw 16bp following the end
-    log.info('Discovering bcs...')
     if arguments.barcode_whitelist:
         log.info('Loading whitelist...')
         whitelist = set(load_bc_list(arguments.barcode_whitelist))
@@ -80,9 +79,12 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
     bc_cntr = Counter()
     found_bcs = 0
     primer_aligner = PrimerAligner(fwd_primer_max_end, rc_primer_max_end)
+    log.info('Discovering bcs...')
     for total_seqs, (rec, strand, start, end) in enumerate(
             primer_aligner.iterate_recs_with_primer_pos(arguments.fastq_files)
             ):
+        if total_seqs % 1000000 == 0:
+            log.info(f'\t{total_seqs:,d}')
         if strand is None:
             continue
         elif strand == '-':
@@ -101,9 +103,6 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
         log.warn(f'Only found {found_bcs:,d} of {desired_bcs:,d} desired raw bcs')
 
     bc_oi_thresh = 50
-    fig, ax = knee_plot(bc_cntr, bc_oi_thresh, good_label='BCs of interest')
-    fig.savefig(os.path.join(arguments.output_dir, 'bcs_of_interest_knee_plot.png'), dpi=300)
-
     bcs_and_counts = [(bc, count) for bc, count in bc_cntr.items()]
     bcs_and_counts.sort(reverse=True, key=lambda tup: tup[1])
     bc_oi_list = [bc for bc, count in bcs_and_counts if count > bc_oi_thresh]
@@ -112,6 +111,9 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
     with open(os.path.join(arguments.output_dir, 'bcs_of_interest.txt'), 'w') as out:
         out.write('\n'.join(bc_oi_list))
     log.info(f'Found {len(bc_oi_list):,d} barcodes of interest')
+
+    fig, ax = knee_plot(bc_cntr, bc_oi_thresh, good_label='BCs of interest')
+    fig.savefig(os.path.join(arguments.output_dir, 'bcs_of_interest_knee_plot.png'), dpi=300)
 
     return bc_oi_list
     
