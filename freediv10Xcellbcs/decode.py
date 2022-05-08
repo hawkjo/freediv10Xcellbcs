@@ -258,7 +258,7 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments
                 stats['Filter 4: bc decode tried and failed'] += 1
                 continue
     
-            umi = 'N'*10
+            obs_umi = 'N'*10
             obs_tail_end = 16
             ops.set_barcode_and_umi(bc, obs_umi)
             ops.set_prefix_end_from_rel_prefix_end_after_primer(obs_tail_end)
