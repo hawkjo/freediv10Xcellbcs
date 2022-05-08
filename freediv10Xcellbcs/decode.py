@@ -183,15 +183,16 @@ def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, 
         stats['Total reads'] += i
         fq_out.close()
 
-        out_stats_fpath = base_out_fpath + '.stats.txt'
-        write_stats_file_from_cntr(stats, out_stats_fpath)
         for k, v in stats.items():
             cum_stats[k] += v
-    
-        out_umi_fpath = base_out_fpath + '.umi_lens.txt'
-        write_stats_file_from_cntr(umi_len_cntr, out_umi_fpath)
         for k, v in umi_len_cntr.items():
             cum_umi_len_cntr[k] += v
+    
+        if len(arguments.fastq_files) > 1:
+            out_stats_fpath = base_out_fpath + '.stats.txt'
+            write_stats_file_from_cntr(stats, out_stats_fpath)
+            out_umi_fpath = base_out_fpath + '.umi_lens.txt'
+            write_stats_file_from_cntr(umi_len_cntr, out_umi_fpath)
 
     out_stats_fpath = os.path.join(arguments.output_dir, 'cumulative.stats.txt')
     write_stats_file_from_cntr(cum_stats, out_stats_fpath)
@@ -265,10 +266,11 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments
         stats['Total reads'] += i
         fq_out.close()
 
-        out_stats_fpath = base_out_fpath + '.stats.txt'
-        write_stats_file_from_cntr(stats, out_stats_fpath)
         for k, v in stats.items():
             cum_stats[k] += v
+        if len(arguments.fastq_files) > 1:
+            out_stats_fpath = base_out_fpath + '.stats.txt'
+            write_stats_file_from_cntr(stats, out_stats_fpath)
     
     out_stats_fpath = os.path.join(arguments.output_dir, 'cumulative.stats.txt')
     write_stats_file_from_cntr(cum_stats, out_stats_fpath)
