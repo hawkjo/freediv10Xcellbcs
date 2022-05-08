@@ -30,7 +30,7 @@ class PrimerAligner:
         Iterates a list of fastq files and yields rec, strand, primer_start, primer_end
         """
         for fastq_file in fastq_files:
-            for rec in SeqIO.parse(gzip_friendly_open(fastq_file)):
+            for rec in SeqIO.parse(gzip_friendly_open(fastq_file), 'fastq'):
                 strand, start, end = self.get_primer_pos_in_rec(rec)
                 yield rec, strand, start, end
 
