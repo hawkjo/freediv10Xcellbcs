@@ -34,7 +34,8 @@ if __name__ == '__main__':
         install_requires=[
             "numpy>=1.20.0",
             "docopt>=0.6.2",
-            "biopython>=1.70",
+            "biopython==1.79",
+            "matplotlib>=3.5.2",
             ],
         zip_safe=False,
         author='John Hawkins',
