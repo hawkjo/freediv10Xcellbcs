@@ -18,7 +18,7 @@ class CommandLineArguments(object):
     @property
     def command(self):
         # We have to do this weird loop to deal with the way docopt stores the command name
-        for possible_command in ('decode'):
+        for possible_command in ('decode',):
             if self._arguments.get(possible_command):
                 return possible_command
 
