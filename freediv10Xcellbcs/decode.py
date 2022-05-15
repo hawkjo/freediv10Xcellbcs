@@ -38,7 +38,8 @@ def build_decoder(arguments):
     """
     if not os.path.exists(arguments.output_dir):
         os.makedirs(arguments.output_dir)
-    fname = f'decoder.d{arguments.max_err_decode}+{arguments.reject_delta}.h5'
+    bc_fname = os.path.basename(arguments.barcode_file)
+    fname = f'{bc_fname}.decoder.d{arguments.max_err_decode}+{arguments.reject_delta}.h5'
     out_fpath = os.path.join(arguments.output_dir, fname)
 
     log.info('Loading given barcode file...')
