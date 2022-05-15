@@ -32,6 +32,24 @@ def decode_fastqs(arguments):
     demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments)
 
 
+def build_decoder(arguments):
+    """
+    Build decoder for fast re-use in decoding
+    """
+    if not os.path.exists(arguments.output_dir):
+        os.makedirs(arguments.output_dir)
+    fname = f'decoder.d{arguments.max_err_decode}+{arguments.reject_delta}.h5'
+    out_fpath = os.path.join(arguments.output_dir, fname)
+
+    log.info('Loading given barcode file...')
+    bc_oi_list = load_bc_list(arguments.barcode_file)
+    log.info('Building barcode decoder...')
+    bd = freebarcodes.decode.FreeDivBarcodeDecoder()
+    bd.build_codebook_from_random_codewords(bc_oi_list, arguments.max_err_decode, arguments.reject_delta)
+    log.info(f'Saving barcode decoder to {out_fpath}')
+    bc.save_codebook(out_fpath)
+
+
 def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments):
     def make_base_out_fpath(fpath):
         fname = os.path.basename(fpath)

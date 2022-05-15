@@ -4,6 +4,7 @@ Free divergence-based decoding of 10X cell barcodes
 Usage:
   freediv10Xcellbcs decode       <fastq_files> <kit_5p_or_3p> [--barcode-whitelist=<barcode_whitelist>] [--expected-cells=<expected_cells>] [--output-dir=<output_dir>] [--max-err-decode=<max_err_decode>] [--reject-delta=<reject_delta>] [--barcode-file=<barcode_file>] [-v | -vv | -vvv]
   freediv10Xcellbcs discover     <fastq_files> [--barcode-whitelist=<barcode_whitelist>] [--expected-cells=<expected_cells>] [--output-dir=<output_dir>] [-v | -vv | -vvv]
+  freediv10Xcellbcs prebuild     --barcode-file=<barcode_file> --max-err-decode=<max_err_decode> --reject-delta=<reject_delta> [--output-dir=<output_dir>] [-v | -vv | -vvv]
 
 Options:
   -h --help     Show this screen.
@@ -18,7 +19,7 @@ import os
 from docopt import docopt
 from .__init__ import __version__
 from .config import CommandLineArguments
-from .decode import decode_fastqs
+from .decode import decode_fastqs, build_decoder 
 from .discover import discover_bcs_main
 
 
@@ -37,6 +38,7 @@ def main(**kwargs):
     commands = {
         'decode': decode_fastqs,
         'discover': discover_bcs_main,
+        'prebuild': build_decoder, 
     }
 
     commands[arguments.command](arguments)
