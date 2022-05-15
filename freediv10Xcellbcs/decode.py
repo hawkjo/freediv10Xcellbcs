@@ -5,7 +5,7 @@ import freebarcodes
 import freebarcodes.decode
 from Bio import SeqIO
 from collections import Counter
-from .discovery import find_primer_dist_ends, discover_bcs
+from .discover import find_primer_dist_ends, discover_bcs
 from .misc import load_bc_list, gzip_friendly_open, write_stats_file_from_cntr
 from .aligners import OrientedPrimerSeq, BcUmiTailAligner
 from .plotting import umi_len_plot
