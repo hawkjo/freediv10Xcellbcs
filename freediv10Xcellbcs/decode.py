@@ -47,7 +47,7 @@ def build_decoder(arguments):
     bd = freebarcodes.decode.FreeDivBarcodeDecoder()
     bd.build_codebook_from_random_codewords(bc_oi_list, arguments.max_err_decode, arguments.reject_delta)
     log.info(f'Saving barcode decoder to {out_fpath}')
-    bc.save_codebook(out_fpath)
+    bd.save_codebook(out_fpath)
 
 
 def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments):
