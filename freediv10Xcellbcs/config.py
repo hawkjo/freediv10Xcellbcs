@@ -60,9 +60,17 @@ class CommandLineArguments(object):
         return int(self._arguments['--threads'] or 1)
 
     @property
+    def decoder_file(self):
+        return os.path.expanduser(self._arguments['--decoder-file']) if self._arguments['--decoder-file'] else None
+
+    @property
     def output_dir(self):
         return self._arguments['--output-dir'] or '.'
 
     @property
     def kit_5p_or_3p(self):
         return self._arguments['<kit_5p_or_3p>']
+
+    @property
+    def no_umis(self):
+        return self._arguments['--no-umis']

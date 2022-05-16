@@ -23,13 +23,19 @@ def decode_fastqs(arguments):
 
     fwd_primer_max_end, rc_primer_max_end = find_primer_dist_ends(arguments)
 
-    if arguments.barcode_file is None:
-        bc_oi_list = discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments)
+    bd = freebarcodes.decode.FreeDivBarcodeDecoder()
+    if arguments.decoder_file:
+        log.info('Loading decoder from file...')
+        bd.load_codebook(arguments.decoder_file)
     else:
         log.info('Loading given barcode file...')
         bc_oi_list = load_bc_list(arguments.barcode_file)
+        log.info('Loading barcode decoder...')
+        bd.build_codebook_from_random_codewords(bc_oi_list, arguments.max_err_decode, arguments.reject_delta)
 
-    demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments)
+
+    demult_func = demultiplex_bcs if arguments.no_umis else demultiplex_bcs_and_umis
+    demult_func(fwd_primer_max_end, rc_primer_max_end, bd, arguments)
 
 
 def build_decoder(arguments):
@@ -51,7 +57,7 @@ def build_decoder(arguments):
     bd.save_codebook(out_fpath)
 
 
-def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments):
+def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bd, arguments):
     def make_base_out_fpath(fpath):
         fname = os.path.basename(fpath)
         for ending in ['.fastq', '.fq', '.fastq.gz', '.fq.gz']:
@@ -63,11 +69,8 @@ def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, 
                 return os.path.join(arguments.output_dir, fname)
         raise ValueError(f'Unrecognized fastq ending in {fpath}')
 
-    log.info('Loading barcode decoder...')
-    bd = freebarcodes.decode.FreeDivBarcodeDecoder()
-    bd.build_codebook_from_random_codewords(bc_oi_list, arguments.max_err_decode, arguments.reject_delta)
-
     log.info('Building barcode-specific aligners...')
+    bc_oi_list = bd._codewords
     bc_umi_aligners = {bc: BcUmiTailAligner(bc, 10, arguments.kit_5p_or_3p) for bc in bc_oi_list}
     example_full_prefix = bc_umi_aligners[bc_oi_list[0]].full_prefix
 
@@ -140,7 +143,7 @@ def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, 
     fig.savefig(out_umi_fpath)
     
 
-def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments):
+def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bd, arguments):
     def make_base_out_fpath(fpath):
         fname = os.path.basename(fpath)
         for ending in ['.fastq', '.fq', '.fastq.gz', '.fq.gz']:
@@ -151,10 +154,6 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bc_oi_list, arguments
                         )
                 return os.path.join(arguments.output_dir, fname)
         raise ValueError(f'Unrecognized fastq ending in {fpath}')
-
-    log.info('Loading barcode decoder...')
-    bd = freebarcodes.decode.FreeDivBarcodeDecoder()
-    bd.build_codebook_from_random_codewords(bc_oi_list, arguments.max_err_decode, arguments.reject_delta)
 
     log.info('Demultiplexing cell barcodes...')
     cum_stats = Counter()
