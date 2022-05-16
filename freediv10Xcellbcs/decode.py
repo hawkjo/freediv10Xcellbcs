@@ -63,8 +63,8 @@ def demultiplex_bcs_and_umis(fwd_primer_max_end, rc_primer_max_end, bd, argument
         for ending in ['.fastq', '.fq', '.fastq.gz', '.fq.gz']:
             if fname.endswith(ending):
                 fname = fname[:-len(ending)] + '.oriented_and_demult.d{}+{}'.format(
-                        arguments.max_err_decode,
-                        arguments.reject_delta
+                        bd.max_err_decode,
+                        bd.reject_delta
                         )
                 return os.path.join(arguments.output_dir, fname)
         raise ValueError(f'Unrecognized fastq ending in {fpath}')
@@ -149,8 +149,8 @@ def demultiplex_bcs(fwd_primer_max_end, rc_primer_max_end, bd, arguments):
         for ending in ['.fastq', '.fq', '.fastq.gz', '.fq.gz']:
             if fname.endswith(ending):
                 fname = fname[:-len(ending)] + '.oriented_and_demult.d{}+{}'.format(
-                        arguments.max_err_decode,
-                        arguments.reject_delta
+                        bd.max_err_decode,
+                        bd.reject_delta
                         )
                 return os.path.join(arguments.output_dir, fname)
         raise ValueError(f'Unrecognized fastq ending in {fpath}')
