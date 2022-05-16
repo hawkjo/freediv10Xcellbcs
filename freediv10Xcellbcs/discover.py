@@ -90,9 +90,7 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
         if found_bcs >= desired_bcs:
             break
     else:
-        if found_bcs < desired_bcs / 2:
-            raise RuntimeError(f'Less than half the desired amount of raw bcs found for discovery: {found_bcs:,d} of {desired_bcs:,d}')
-        log.warn(f'Only found {found_bcs:,d} of {desired_bcs:,d} desired raw bcs')
+        log.warn(f'Low barcode count: Only found {found_bcs:,d} of {desired_bcs:,d} desired raw bcs')
 
     bc_oi_thresh = 50
     bcs_and_counts = [(bc, count) for bc, count in bc_cntr.items()]
