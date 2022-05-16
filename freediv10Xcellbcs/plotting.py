@@ -26,7 +26,6 @@ def umi_len_plot(umi_len_cntr):
     for ax in axes:
         ax.set_ylabel('Count', fontsize=fs)
         ax.set_xlabel('UMI length', fontsize=fs)
-        ax.set_title(sample)
     ax = axes[1]
     ax.set_yscale('log')
     ylim = ax.get_ylim()
