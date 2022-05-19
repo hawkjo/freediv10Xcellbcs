@@ -57,7 +57,7 @@ class CommandLineArguments(object):
 
     @property
     def reads_per_cell(self):
-        return int(self._arguments['--reads_per_cell'] or 5000)
+        return int(self._arguments['--reads-per-cell'] or 5000)
 
     @property
     def threshold(self):
