@@ -67,7 +67,7 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
         def in_whitelist(bc):
             return True
 
-    desired_bcs = 5000 * arguments.expected_cells
+    desired_bcs = arguments.reads_per_cell * arguments.expected_cells
     bc_cntr = Counter()
     found_bcs = 0
     primer_aligner = PrimerAligner(fwd_primer_max_end, rc_primer_max_end)
@@ -87,23 +87,22 @@ def discover_bcs(fwd_primer_max_end, rc_primer_max_end, arguments):
             continue
         bc_cntr[bc] += 1
         found_bcs += 1
-        if found_bcs >= desired_bcs:
+        if total_seqs >= desired_bcs:
             break
     else:
         log.warn(f'Low barcode count: Only found {found_bcs:,d} of {desired_bcs:,d} desired raw bcs')
 
-    bc_oi_thresh = 50
     bcs_and_counts = [(bc, count) for bc, count in bc_cntr.items()]
     bcs_and_counts.sort(reverse=True, key=lambda tup: tup[1])
     counts = [count for bc, count in bcs_and_counts]
-    bc_oi_list = [bc for bc, count in bcs_and_counts if count > bc_oi_thresh]
+    bc_oi_list = [bc for bc, count in bcs_and_counts if count > arguments.threshold]
     with open(os.path.join(arguments.output_dir, 'all_bcs_and_counts.txt'), 'w') as out:
         out.write('\n'.join([f'{bc}\t{count}' for bc, count in bcs_and_counts]))
     with open(os.path.join(arguments.output_dir, 'bcs_of_interest.txt'), 'w') as out:
         out.write('\n'.join(bc_oi_list))
     log.info(f'Found {len(bc_oi_list):,d} barcodes of interest')
 
-    fig, ax = knee_plot(counts, bc_oi_thresh, good_label='BCs of interest')
+    fig, ax = knee_plot(counts, arguments.threshold, good_label='BCs of interest')
     fig.savefig(os.path.join(arguments.output_dir, 'bcs_of_interest_knee_plot.png'), dpi=300)
 
     return bc_oi_list

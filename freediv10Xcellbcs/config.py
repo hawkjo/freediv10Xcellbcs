@@ -56,6 +56,14 @@ class CommandLineArguments(object):
         return os.path.expanduser(self._arguments['--barcode-whitelist']) if self._arguments['--barcode-whitelist'] else None
 
     @property
+    def reads_per_cell(self):
+        return int(self._arguments['--reads_per_cell'] or 5000)
+
+    @property
+    def threshold(self):
+        return int(self._arguments['--threshold'] or 50)
+
+    @property
     def threads(self):
         return int(self._arguments['--threads'] or 1)
 

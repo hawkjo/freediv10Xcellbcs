@@ -3,7 +3,7 @@ Free divergence-based decoding of 10X cell barcodes
 
 Usage:
   freediv10Xcellbcs decode       <fastq_files> <kit_5p_or_3p> [--barcode-file=<barcode_file>] [--max-err-decode=<max_err_decode>] [--reject-delta=<reject_delta>] [--decoder-file=<decoder_file>] [--output-dir=<output_dir>] [--no-umis] [-v | -vv | -vvv]
-  freediv10Xcellbcs discover     <fastq_files> [--barcode-whitelist=<barcode_whitelist>] [--expected-cells=<expected_cells>] [--output-dir=<output_dir>] [-v | -vv | -vvv]
+  freediv10Xcellbcs discover     <fastq_files> [--barcode-whitelist=<barcode_whitelist>] [--expected-cells=<expected_cells>] [--reads-per-cell=<reads_per_cell>] [--threshold=<threshold>] [--output-dir=<output_dir>] [-v | -vv | -vvv]
   freediv10Xcellbcs prebuild     --barcode-file=<barcode_file> --max-err-decode=<max_err_decode> --reject-delta=<reject_delta> [--output-dir=<output_dir>] [-v | -vv | -vvv]
 
 Options:
