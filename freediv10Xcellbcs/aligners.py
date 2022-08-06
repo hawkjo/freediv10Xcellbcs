@@ -67,12 +67,13 @@ class PrimerAligner:
 
         fwd_alignments = self.align_rec(rec[:self.fwd_primer_max_end])
         rc_alignments = self.align_rec(rec.reverse_complement()[:self.rc_primer_max_end])
-        for aln, strand in [(fwd_alignments, '+'), (rc_alignments, '-')]:
-            if aln.score >= self.err_thresh:
-                start = aln.aligned[1][0][0]  
-                end = aln.aligned[1][-1][-1] 
-                if not mostly_overlaps_previous(strand, start, end):
-                    primer_pos_list.append((strand, start, end))
+        for alns, strand in [(fwd_alignments, '+'), (rc_alignments, '-')]:
+            for aln in alns:
+                if aln.score >= self.err_thresh:
+                    start = aln.aligned[1][0][0]  
+                    end = aln.aligned[1][-1][-1] 
+                    if not mostly_overlaps_previous(strand, start, end):
+                        primer_pos_list.append((strand, start, end))
         return primer_pos_list
 
 
