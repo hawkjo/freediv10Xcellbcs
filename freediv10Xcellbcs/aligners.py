@@ -51,6 +51,30 @@ class PrimerAligner:
         else:
             return None, None, None
 
+    def get_all_primer_pos_in_rec(self, rec):
+        """
+        Finds the strand, start, and end of all primers in given rec. Returns [] if not found.
+        """
+        primer_pos_list = []
+        dist_thresh = 0.25 * len(self.primerseq)
+        def mostly_overlaps_previous(strand, start, end):
+            for prev_strand, prev_start, prev_end in primer_pos_list:
+                if (strand == prev_strand
+                        and abs(start - prev_start) < dist_thresh
+                        and abs(end - prev_end) < dist_thresh):
+                    return True
+            return False
+
+        fwd_alignments = self.align_rec(rec[:self.fwd_primer_max_end])
+        rc_alignments = self.align_rec(rec.reverse_complement()[:self.rc_primer_max_end])
+        for aln, strand in [(fwd_alignments, '+'), (rc_alignments, '-')]:
+            if aln.score >= self.err_thresh:
+                start = aln.aligned[1][0][0]  
+                end = aln.aligned[1][-1][-1] 
+                if not mostly_overlaps_previous(strand, start, end):
+                    primer_pos_list.append((strand, start, end))
+        return primer_pos_list
+
 
 class OrientedPrimerSeq:
     def __init__(self, rec, fwd_primer_max_end, rc_primer_max_end):
