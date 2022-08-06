@@ -14,7 +14,6 @@ Commands:
   decode        Decode barcodes in fastq files with same barcodes. Separate file names with commas.
   discover      Discover barcodes de novo in fastq files. Separate file names with commas.
   prebuild      Prebuild decoder for repeated use with same barcodes and settings.
-
 """
 import logging
 import os
