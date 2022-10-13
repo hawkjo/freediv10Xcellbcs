@@ -100,7 +100,7 @@ class OrientedPrimerSeq:
         self.umi = None
 
         max_primer_end = fwd_primer_max_end if self.strand == '+' else rc_primer_max_end
-        self.is_well_formed = bool(self.primer_start > 0 and self.primer_end < max_primer_end)  # has leading and trailing gaps
+        self.is_well_formed = bool(self.primer_start >= 0 and self.primer_end < max_primer_end)  # has leading and trailing gaps
         
     @property
     def observed_primer(self):
