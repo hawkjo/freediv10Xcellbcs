@@ -6,7 +6,13 @@ A package for decoding 10X barcodes with conflict-aware and rejection-shell capa
 
 ### Installation
 
-The following instructions should work across platforms, except that installing virtualenv with apt-get is Ubuntu specific. For other platforms, install virtualenv appropriately if desired.
+For easiest installation, use pip:
+
+```
+pip install freediv10Xcellbcs
+```
+
+The following instructions should also work for manual installation across platforms, except that installing virtualenv with apt-get is Ubuntu specific. For other platforms, install virtualenv appropriately if desired.
 
 First, clone the repository to a local directory:
 
@@ -23,10 +29,10 @@ virtualenv envfreebarcodes
 . envfreebarcodes/bin/activate
 ```
 
-Now install required packages and freediv10Xcellbcs using pip:
+Now install required packages listed in `setup.py` and install freediv10Xcellbcs with `setup.py`:
 
 ```
-pip install numpy==1.13.3 && pip install -r requirements.txt && python setup.py install
+python setup.py install
 ```
 
 ### Usage
