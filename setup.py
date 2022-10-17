@@ -41,7 +41,7 @@ if __name__ == '__main__':
         author='John Hawkins',
         author_email='hawkjo@gmail.com',
         description='FREE divergence-based decoding of 10X cell barcodes',
-        url='',
+        url='https://github.com/hawkjo/freediv10Xcellbcs',
         download_url='',
         keywords=['DNA', 'NGS', 'bioinformatics', 'barcodes', '10X'],
         python_requires='>=3.0',
